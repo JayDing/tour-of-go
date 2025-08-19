@@ -30,16 +30,16 @@ go build -o tour-of-go main.go
 ### Testing
 ```bash
 # Run tests (currently no test files exist)
-go test -v ./...
+go test -v ./
 ```
 
 ### Code Quality
 ```bash
 # Format Go code
-go fmt ./...
+go fmt ./
 
 # Check for potential issues
-go vet ./...
+go vet ./
 
 # Run Go modules commands
 go mod tidy    # Clean up dependencies
