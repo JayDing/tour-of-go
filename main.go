@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"math"
+	"runtime"
+	"time"
 )
 
 // shortened
@@ -32,6 +34,17 @@ func needInt(x int) int {
 
 func needFloat(x float64) float64 {
 	return x * 0.1
+}
+
+// variables declared by the statement are only in scope until the end of the `if`.
+// variables are also available inside any of the `else` blocks.
+func pow(x, n, lim float64) float64 {
+	if v := math.Pow(x, n); v < lim {
+		return v
+	} else {
+		fmt.Printf("%g >= %g\n", v, lim)
+	}
+	return lim
 }
 
 // newton's method for square root
@@ -98,4 +111,41 @@ func main() {
 	fmt.Println(needFloat(Big))
 
 	fmt.Printf("%g, %g\n", sqrt(2), math.Sqrt(2))
+
+	// no break statement in Go
+	// variables declared by the statement are only in scope until the end of the `switch` or `case`.
+	switch os := runtime.GOOS; os {
+	case "darwin":
+		fmt.Println("OS X")
+	case "linux":
+		fmt.Println("Linux.")
+	default:
+		// freebsd, openbsd,
+		// plan9, windows...
+		fmt.Printf("%s.\n", os)
+	}
+
+	fmt.Println("When's Saturday?")
+	today := time.Now().Weekday()
+	switch time.Saturday {
+	case today + 0:
+		fmt.Println("Today.")
+	case today + 1:
+		fmt.Println("Tomorrow.")
+	case today + 2:
+		fmt.Println("In two days.")
+	default:
+		fmt.Println("Too far away.")
+	}
+
+	// switch with no condition is the same as `switch true`
+	t := time.Now()
+	switch {
+	case t.Hour() < 12:
+		fmt.Println("Good morning!")
+	case t.Hour() < 17:
+		fmt.Println("Good afternoon.")
+	default:
+		fmt.Println("Good evening.")
+	}
 }
