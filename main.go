@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"math"
+	"os"
 	"runtime"
 	"time"
 )
@@ -59,6 +61,77 @@ func sqrt(x float64) float64 {
 	}
 
 	return pz
+}
+
+// defer statements are executed in last-in-first-out (LIFO) order.
+func callDefer1() {
+	defer fmt.Println("world")
+
+	fmt.Println("hello")
+
+	fmt.Println("counting")
+
+	for i := 0; i < 10; i++ {
+		defer fmt.Println(i)
+	}
+
+	fmt.Println("done")
+}
+
+func copyFile1(dstName, srcName string) (written int64, err error) {
+	src, err := os.Open(srcName)
+	if err != nil {
+		fmt.Println("return when `src` err", err)
+		return
+	}
+	defer closeFileAndPrint(src)
+
+	// dst, err := os.Open(dstName) // this will occur an error if the file does not exist
+	dst, err := os.Create(dstName)
+	if err != nil {
+		fmt.Println("return when `dst` err", err)
+		return
+	}
+	defer closeFileAndPrint(dst)
+
+	return io.Copy(dst, src)
+}
+
+func copyFile2(dstName, srcName string) (written int64, err error) {
+	src, err := os.Open(srcName)
+	if err != nil {
+		fmt.Println("return when `src` err", err)
+		return
+	}
+	defer closeFileAndPrint(src)
+
+	dst, err := os.Open(dstName) // this will occur an error if the file does not exist
+	if err != nil {
+		fmt.Println("return when `dst` err", err)
+		return
+	}
+	defer closeFileAndPrint(dst)
+
+	return io.Copy(dst, src)
+}
+
+func closeFileAndPrint(f *os.File) {
+	if err := f.Close(); err != nil {
+		fmt.Println("Error closing file:", err)
+	} else {
+		fmt.Println("File closed successfully.", f.Name())
+	}
+}
+
+func callDefer2() {
+	copyFile1("dst.txt", "src.txt")
+	copyFile2("ddd.txt", "src.txt")
+}
+
+func callDefer3() (i int) {
+	// defer function will be executed after the return statement.
+	defer func() { i++ }()
+	return 2222
 }
 
 func main() {
@@ -148,4 +221,8 @@ func main() {
 	default:
 		fmt.Println("Good evening.")
 	}
+
+	callDefer1()
+	callDefer2()
+	fmt.Println("callDefer3() =", callDefer3())
 }
